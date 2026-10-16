@@ -1,0 +1,14 @@
+.ssh/
+.cache/
+.bash_history
+kali-armhf/
+downloads/
+*.db
+secreto.txt
+ip_log.txt
+reporte.txt
+.termux/
+.gitconfig
+.wget-hsts
+install-nethunter-termux
+.bash_history
