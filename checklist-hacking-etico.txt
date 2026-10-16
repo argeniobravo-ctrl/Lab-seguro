@@ -1,0 +1,43 @@
+=== CHECKLIST HACKING ETICO WEB - Dany ===
+
+1. XSS (Cross Site Scripting)
+
+Vulnerable: {{var | safe}} / innerHTML = userInput
+Payloads: 
+  <script>alert(1)</script>
+  <img src=x onerror=alert(1)>
+Fix: {{var}} (sin safe), escapar HTML, usar textContent no innerHTML
+
+2. SQLi (SQL Injection)
+
+Vulnerable: f"SELECT * FROM users WHERE id={id}"
+Payloads:
+  1 OR 1=1
+  0 UNION SELECT 1,2,3
+  ' OR '1'='1
+Fix: query parametrizada -> WHERE id = ? , (id,)
+
+3. LFI / Path Traversal
+
+Vulnerable: open(f"paginas/{page}.txt")
+Payloads:
+  ../secreto
+  ../../etc/passwd
+  ..%2F..%2Fetc%2Fpasswd
+Fix:
+    - Bloquear si ".." in page or "/" in page
+    - os.path.abspath(ruta).startswith(BASE)
+    - Whitelist: solo permitir ["inicio","contacto"]
+
+FLUJO DE PRUEBA:
+1. Prueba normal
+2. Prueba payload
+3. Verifica que lees más de lo debido
+4. Aplica fix
+
+LABS LOCALES CREADOS:
+- xss_lab.py / xss_lab_fixed.py : puerto 8083
+- sqli_lab.py / sqli_lab_fixed.py : puerto 8083
+- lfi_lab.py / lfi_lab_fixed.py : puerto 8083
+
+TODO EN LOCAL - 127.0.0.1 - NUNCA PROBAR EN WEBS REALES SIN PERMISO
