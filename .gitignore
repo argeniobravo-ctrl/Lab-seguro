@@ -1,0 +1,11 @@
+.ssh/
+.bash_history
+.cache/
+.termux/
+.gitconfig
+.wget-hsts
+secreto.txt
+ip_log.txt
+log.txt
+sqli.db
+downloads/

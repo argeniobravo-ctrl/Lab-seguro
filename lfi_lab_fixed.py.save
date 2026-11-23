@@ -1,0 +1,62 @@
+00000from flask import Flask, request
+import os
+from datetime import datetime
+
+app = Flask(__name__)
+BASE = os.path.abspath("paginas")
+
+def log_ip():
+    ip = request.remote_addr
+    device = request.headers.get('User-Agent', 'Desconocido')[:80]
+    ruta = request.full_path
+    hora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    linea = f"[{hora}] IP: {ip} - Ruta: {ruta} - Device: {device}\n"
+    print(linea)
+    with open("/data/data/com.termux/files/home/ip_log.txt", "a") as f:
+        f.write(linea)
+
+@app.before_request
+def before():
+    log_ip()
+
+@app.route('/')
+def index():
+    page = request.args.get('page', 'inicio.txt')
+    if '..' in page or page.startswith('/'):
+        return "<h2>Bloqueado</h2><p>../ no permitido</p>"
+    ruta = os.path.join(BASE, page)
+    try:
+        with open(ruta, 'r') as f:
+            contenido = f.read()
+    except:
+        contenido = "No existe"
+    return f"<h2>Lab ARREGLADO</h2><p>Leyendo: <code>{ruta}</code></p><p>Contenido: {contenido}</p><p><i>Ahora ../ está bloqueado</i></p><form><input name=page><input type=submit></form>"
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8083))
+
+@app.route("/")
+def index():
+    pagina = request.args.get('page', 'inicio')
+    # ARREGLADO - solo permitir nombres simples, sin / ni .
+    if ".." in pagina or "/" in pagina or "\\" in pagina:
+        return "<h3>Bloqueado! No se permite ../ ni /</h3>"
+
+    ruta = os.path.join(BASE, f"{pagina}.txt")
+    # doble check: que siga dentro de BASE
+    if not os.path.abspath(ruta).startswith(BASE):
+        return "<h3>Bloqueado por seguridad</h3>"
+        
+    try:
+        contenido = open(ruta).read()
+    except Exception as e:
+        contenido = f"Error: {e}"
+    
+    return f"""
+    <h2>Lab ARREGLADO</h2>
+    <p>Leyendo: <code>{ruta}</code></p>
+    <p>Contenido: {contenido}</p>
+    <p><i>Ahora ../ está bloqueado</i></p>
+    <form><input name=page><input type=submit></form>
+    """
+app.run(host='0.0.0.0', port=8083)
